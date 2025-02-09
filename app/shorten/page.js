@@ -23,17 +23,38 @@ const Shorten = () => {
             redirect: "follow"
         };
 
+        // fetch("/api/generate", requestOptions)
+        //     .then((response) => response.json())
+        //     .then((result) => {
+        //         setGenerated(`${process.env.NEXT_PUBLIC_HOST}/${shorturl}`)
+        //         seturl("")   
+        //         setshorturl("")
+        //         console.log(result)
+        //         alert(result.message)
+
+        //     })
+        //     .catch((error) => console.error(error));
         fetch("/api/generate", requestOptions)
-            .then((response) => response.json())
-            .then((result) => {
-                setGenerated(`${process.env.NEXT_PUBLIC_HOST}/${shorturl}`)
-                seturl("")   
-                setshorturl("")
-                console.log(result)
-                alert(result.message)
-            
+            .then((response) => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`Error ${response.status}: ${text}`);
+                    });
+                }
+                return response.json();
             })
-            .catch((error) => console.error(error));
+            .then((result) => {
+                setGenerated(`${process.env.NEXT_PUBLIC_HOST}/${shorturl}`);
+                seturl("");
+                setshorturl("");
+                console.log(result);
+                alert(result.message);
+            })
+            .catch((error) => {
+                console.error("Fetch error:", error);
+                alert(`Failed to fetch: ${error.message}`);
+            });
+
     }
 
 
@@ -55,8 +76,8 @@ const Shorten = () => {
                 <button onClick={generate} className='bg-purple-500 rounded-lg shadow-lg p-3 py-1 my-3 font-bold text-white'>Generate</button>
             </div>
 
-            {generated && <> <span className='font-bold text-lg'>Your Short Link </span><code><Link target="_blank" href={generated}>{generated}</Link> 
-                </code></>}
+            {generated && <> <span className='font-bold text-lg'>Your Short Link </span><code><Link target="_blank" href={generated}>{generated}</Link>
+            </code></>}
         </div>
     )
 }
